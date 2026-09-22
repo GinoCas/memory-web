@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prueba de Memoria</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Encabezado de la Aplicación -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">🧠</span>
+        <div>
+          <h1 class="brand-title">NeuroLab: Prueba de Memoria</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="brand-badge">Estudio de Memoria</span>
+        <a href="admin.html" class="admin-nav-link" title="Ir al Panel de Control del Investigador">⚙️ Panel Admin</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal donde se montan las pantallas del experimento -->
+  <main id="app" class="app-container" role="main">
+    <!-- Renderizado reactivo por ScreenRegistry -->
+  </main>
+
+  <!-- ==============================================================================
+       SCRIPTS: ARQUITECTURA LIMPIA Y CARGA MODULAR SIN PROBLEMAS DE CORS LOCAL
+       ============================================================================== -->
+  
+  <!-- 1. Configuración editable por el usuario -->
+  <script src="config.js"></script>
+
+  <!-- 2. Capa de Dominio -->
+  <script src="js/domain/constants.js"></script>
+  <script src="js/domain/Session.js"></script>
+  <script src="js/domain/Statistics.js"></script>
+
+  <!-- 3. Capa de Infraestructura -->
+  <script src="js/infrastructure/ConfigValidator.js"></script>
+  <script src="js/infrastructure/LocalStorageRepo.js"></script>
+  <script src="js/infrastructure/GoogleSheetsRepo.js"></script>
+  <script src="js/infrastructure/CompositeRepo.js"></script>
+  <script src="js/infrastructure/LocalStorageSynonymRepo.js"></script>
+
+  <!-- 4. Capa de Casos de Uso (Lógica de Negocio) -->
+  <script src="js/usecases/StartSession.js"></script>
+  <script src="js/usecases/EvaluateRecall.js"></script>
+  <script src="js/usecases/SaveSession.js"></script>
+  <script src="js/usecases/GetStatistics.js"></script>
+  <script src="js/usecases/ReevaluateSessions.js"></script>
+
+  <!-- 5. Capa de Presentación -->
+  <script src="js/presentation/Timer.js"></script>
+  <script src="js/presentation/StimulusStrategies.js"></script>
+  <script src="js/presentation/DotPlotChart.js"></script>
+  <script src="js/presentation/ScreenRegistry.js"></script>
+  <script src="js/presentation/app.js"></script>
+</body>
+</html>
