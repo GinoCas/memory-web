@@ -597,9 +597,6 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
             <section class="results-section history-section">
               <div class="history-header">
                 <h3 class="section-title">Historial de Pruebas Recopiladas</h3>
-                <div class="export-buttons">
-                  <button type="button" id="btnClearHistory" class="btn btn-danger-outline btn-sm">Borrar Datos Locales</button>
-                </div>
               </div>
 
               <div class="table-responsive">
@@ -643,7 +640,6 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
 
         // Eventos de la pantalla de resultados
         rootElement.querySelector('#btnNewSession').onclick = events.onResetToWelcome;
-        rootElement.querySelector('#btnClearHistory').onclick = events.onClearHistory;
       }
     }
   };

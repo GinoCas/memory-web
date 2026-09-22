@@ -100,10 +100,7 @@ window.SpatialApp = window.SpatialApp || {};
         onStimulusCompleted: (data) => this._handleStimulusCompleted(data),
         onDistractorCompleted: () => this._handleDistractorCompleted(),
         onRecallSubmitted: (data) => this._handleRecallSubmitted(data),
-        onResetToWelcome: () => this._handleResetToWelcome(),
-        onExportCSV: () => this._handleExportCSV(),
-        onExportJSON: () => this._handleExportJSON(),
-        onClearHistory: () => this._handleClearHistory()
+        onResetToWelcome: () => this._handleResetToWelcome()
       };
 
       screen.render({
@@ -180,22 +177,7 @@ window.SpatialApp = window.SpatialApp || {};
       this.navigateTo(Domain.ScreenId.WELCOME);
     }
 
-    _handleClearHistory() {
-      const confirmClear = window.confirm(
-        '¿Estás seguro de que deseas borrar todos los datos recopilados hasta ahora? Esta acción no se puede deshacer.'
-      );
 
-      const actionMap = {
-        true: () => {
-          this.repository.clear();
-          this.appState.statsReport = this.useCases.getStatistics.execute();
-          this.navigateTo(Domain.ScreenId.RESULTS);
-        },
-        false: () => {}
-      };
-
-      actionMap[confirmClear]();
-    }
   }
 
   // Arranque al cargar el DOM
