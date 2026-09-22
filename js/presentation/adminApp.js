@@ -282,6 +282,9 @@ window.SpatialApp = window.SpatialApp || {};
                 <h3 class="admin-section-title">📋 Pruebas Registradas (Recálculo Dinámico)</h3>
                 <p class="admin-section-desc">Puntuaciones actualizadas de acuerdo con los sinónimos y criterios de corrección actuales.</p>
               </div>
+              <button type="button" id="btnAdminClearHistory" class="btn btn-danger-outline btn-sm">
+                🗑️ Borrar Datos Locales
+              </button>
             </div>
 
             <div class="table-responsive">
@@ -387,6 +390,27 @@ window.SpatialApp = window.SpatialApp || {};
           };
 
           validateAction[newSynonym.length > 0]();
+        };
+      }
+
+      // 5. Borrar historial de pruebas locales desde el panel de administrador
+      const btnClear = this.rootElement.querySelector('#btnAdminClearHistory');
+      if (btnClear) {
+        btnClear.onclick = () => {
+          const confirmClear = window.confirm(
+            '¿Estás seguro de que deseas borrar todas las pruebas registradas en este navegador (LocalStorage)? (Los sinónimos aprobados se conservarán).'
+          );
+
+          const clearActionMap = {
+            true: () => {
+              this.sessionRepo.clear();
+              this.dismissedRepo.clear();
+              this.render();
+            },
+            false: () => {}
+          };
+
+          clearActionMap[confirmClear]();
         };
       }
     }
