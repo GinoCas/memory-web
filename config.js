@@ -22,7 +22,7 @@ window.EXPERIMENT_CONFIG = {
 
   // Ruta relativa o absoluta de la imagen para el Grupo 1 (Memoria Espacial).
   // Cuando tengas tu imagen, colócala en esta ruta o actualiza el nombre aquí.
-  imagePath: "assets/image.jpg",
+  imagePath: "assets/image.png",
 
   // URL del Web App de Google Apps Script para guardar datos en Google Sheets.
   // Déjalo vacío ("") si solo quieres guardar en el almacenamiento local del navegador.
