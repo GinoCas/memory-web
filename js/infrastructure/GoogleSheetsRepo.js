@@ -59,13 +59,17 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
       });
     }
 
-    // Los métodos getAll() y clear() no aplican para este repositorio de solo-escritura
+    // Los métodos getAll(), clear() y saveAll() no aplican para este repositorio de solo-escritura
     getAll() {
       return [];
     }
 
     clear() {
       // No-op
+    }
+
+    saveAll(sessions) {
+      // No-op: Evitar duplicar registros en Sheets al recalcular sesiones locales
     }
   }
 

@@ -25,6 +25,14 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
       this.repos.forEach(repo => repo.save(session));
     }
 
+    saveAll(sessions) {
+      this.repos.forEach(repo => {
+        if (typeof repo.saveAll === 'function') {
+          repo.saveAll(sessions);
+        }
+      });
+    }
+
     getAll() {
       // Devolver los datos del primer repositorio (generalmente el local)
       const primaryRepo = this.repos[0];
