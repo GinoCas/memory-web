@@ -47,6 +47,16 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
     }
 
     /**
+     * Sincroniza/reemplaza la lista completa de palabras descartadas
+     * @param {string[]} list
+     */
+    saveAll(list) {
+      if (Array.isArray(list)) {
+        this._saveAll(list);
+      }
+    }
+
+    /**
      * Marca una palabra como descartada (falsa alarma confirmada)
      * @param {string} word
      */

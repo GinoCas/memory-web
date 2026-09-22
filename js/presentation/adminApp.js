@@ -27,7 +27,9 @@ window.SpatialApp = window.SpatialApp || {};
     init() {
       try {
         this.config = Infrastructure.ConfigValidator.validate(window.EXPERIMENT_CONFIG);
-        this.sessionRepo = new Infrastructure.LocalStorageSessionRepository();
+        const localRepo = new Infrastructure.LocalStorageSessionRepository();
+        this.sheetsRepo = new Infrastructure.GoogleSheetsRepo(this.config.googleSheetsWebAppUrl);
+        this.sessionRepo = new Infrastructure.CompositeRepo([localRepo, this.sheetsRepo]);
         this.synonymRepo = new Infrastructure.LocalStorageSynonymRepository();
         this.dismissedRepo = new Infrastructure.LocalStorageDismissedRepository();
 
@@ -41,13 +43,40 @@ window.SpatialApp = window.SpatialApp || {};
           )
         };
 
-        // Reevaluación inicial para sincronizar datos
+        // Reevaluación inicial con datos locales y renderizado inmediato
         this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
-
         this.render();
+
+        // Sincronizar automáticamente desde Google Sheets (fuente de verdad)
+        this.syncWithGoogleSheets();
       } catch (err) {
         this._renderError(err.message);
       }
+    }
+
+    async syncWithGoogleSheets() {
+      const synced = await this.sessionRepo.syncFromCloud({
+        defaultTargetWords: this.config.words,
+        synonymRepo: this.synonymRepo,
+        dismissedRepo: this.dismissedRepo
+      });
+
+      const refreshMap = {
+        true: () => {
+          this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+          this.render();
+        },
+        false: () => {}
+      };
+      refreshMap[Boolean(synced)]();
+    }
+
+    _pushAdminChangesToCloud() {
+      this.sheetsRepo.syncAdminState({
+        sessions: this.sessionRepo.getAll(),
+        synonyms: this.synonymRepo.getAll(),
+        dismissed: this.dismissedRepo.getAll()
+      });
     }
 
     _renderError(msg) {
@@ -279,12 +308,17 @@ window.SpatialApp = window.SpatialApp || {};
           <section class="admin-section">
             <div class="admin-section-header">
               <div>
-                <h3 class="admin-section-title">📋 Pruebas Registradas (Recálculo Dinámico)</h3>
-                <p class="admin-section-desc">Puntuaciones actualizadas de acuerdo con los sinónimos y criterios de corrección actuales.</p>
+                <h3 class="admin-section-title">📋 Pruebas Registradas (Sincronizadas con Google Sheets)</h3>
+                <p class="admin-section-desc">Puntuaciones actualizadas de acuerdo con tu planilla de Google Sheets y los sinónimos actuales.</p>
               </div>
-              <button type="button" id="btnAdminClearHistory" class="btn btn-danger-outline btn-sm">
-                🗑️ Borrar Datos Locales
-              </button>
+              <div class="export-buttons">
+                <button type="button" id="btnAdminSyncSheets" class="btn btn-outline btn-sm">
+                  🔄 Sincronizar con Google Sheets
+                </button>
+                <button type="button" id="btnAdminClearHistory" class="btn btn-danger-outline btn-sm">
+                  🗑️ Borrar Caché Local
+                </button>
+              </div>
             </div>
 
             <div class="table-responsive">
@@ -325,6 +359,7 @@ window.SpatialApp = window.SpatialApp || {};
             true: () => {
               this.synonymRepo.addSynonym(targetWord, synonymWord);
               this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+              this._pushAdminChangesToCloud();
               this.render();
             },
             false: () => {}
@@ -339,6 +374,7 @@ window.SpatialApp = window.SpatialApp || {};
         btn.onclick = () => {
           const word = btn.getAttribute('data-word');
           this.dismissedRepo.dismiss(word);
+          this._pushAdminChangesToCloud();
           this.render();
         };
       });
@@ -348,6 +384,7 @@ window.SpatialApp = window.SpatialApp || {};
         btn.onclick = () => {
           const word = btn.getAttribute('data-word');
           this.dismissedRepo.restore(word);
+          this._pushAdminChangesToCloud();
           this.render();
         };
       });
@@ -360,11 +397,12 @@ window.SpatialApp = window.SpatialApp || {};
 
           this.synonymRepo.removeSynonym(targetWord, synonymWord);
           this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+          this._pushAdminChangesToCloud();
           this.render();
         };
       });
 
-      // 3. Agregar sinónimo manualmente
+      // 5. Agregar sinónimo manualmente
       const manualForm = this.rootElement.querySelector('#formManualSynonym');
       if (manualForm) {
         manualForm.onsubmit = (e) => {
@@ -380,6 +418,7 @@ window.SpatialApp = window.SpatialApp || {};
             true: () => {
               this.synonymRepo.addSynonym(targetWord, newSynonym);
               this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+              this._pushAdminChangesToCloud();
               this.render();
             },
             false: () => {
@@ -393,12 +432,22 @@ window.SpatialApp = window.SpatialApp || {};
         };
       }
 
-      // 5. Borrar historial de pruebas locales desde el panel de administrador
+      // 6. Sincronizar manualmente desde Google Sheets
+      const btnSync = this.rootElement.querySelector('#btnAdminSyncSheets');
+      if (btnSync) {
+        btnSync.onclick = async () => {
+          btnSync.textContent = '⏳ Sincronizando...';
+          btnSync.disabled = true;
+          await this.syncWithGoogleSheets();
+        };
+      }
+
+      // 7. Borrar historial de pruebas locales desde el panel de administrador
       const btnClear = this.rootElement.querySelector('#btnAdminClearHistory');
       if (btnClear) {
         btnClear.onclick = () => {
           const confirmClear = window.confirm(
-            '¿Estás seguro de que deseas borrar todas las pruebas registradas en este navegador (LocalStorage)? (Los sinónimos aprobados se conservarán).'
+            '¿Estás seguro de que deseas borrar la caché local de este navegador? Si aún tienes filas en Google Sheets, vuelve a hacer clic en "Sincronizar con Google Sheets" para traerlas.'
           );
 
           const clearActionMap = {

@@ -61,6 +61,9 @@ window.SpatialApp = window.SpatialApp || {};
 
         // 3. Renderizar pantalla inicial
         this.navigateTo(Domain.ScreenId.WELCOME);
+
+        // 4. Sincronizar en segundo plano con Google Sheets (fuente de verdad)
+        this._syncWithCloud();
       } catch (err) {
         this._renderFatalError(err.message);
       }
@@ -168,16 +171,43 @@ window.SpatialApp = window.SpatialApp || {};
       this.appState.lastCompletedSession = savedSession;
       this.appState.statsReport = statsReport;
 
-      // 4. Mostrar pantalla final
+      // 4. Mostrar pantalla final inmediatamente
       this.navigateTo(Domain.ScreenId.RESULTS);
+
+      // 5. Sincronizar con Google Sheets para asegurar que el gráfico tenga todas las pruebas de la planilla
+      this._syncWithCloud(savedSession);
+    }
+
+    async _syncWithCloud(preserveSession = null) {
+      const synced = await this.repository.syncFromCloud({
+        defaultTargetWords: this.config.words,
+        synonymRepo: this.synonymRepository,
+        preserveSession
+      });
+
+      const refreshAction = {
+        true: () => {
+          this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+          this.appState.statsReport = this.useCases.getStatistics.execute();
+
+          const isOnResults = this.appState.currentScreen === Domain.ScreenId.RESULTS;
+          const reRenderMap = {
+            true: () => this.navigateTo(Domain.ScreenId.RESULTS),
+            false: () => {}
+          };
+          reRenderMap[isOnResults]();
+        },
+        false: () => {}
+      };
+
+      refreshAction[Boolean(synced)]();
     }
 
     _handleResetToWelcome() {
       this.appState.currentSession = null;
       this.navigateTo(Domain.ScreenId.WELCOME);
+      this._syncWithCloud();
     }
-
-
   }
 
   // Arranque al cargar el DOM

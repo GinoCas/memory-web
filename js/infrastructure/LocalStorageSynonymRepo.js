@@ -47,6 +47,16 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
     }
 
     /**
+     * Sincroniza/reemplaza el diccionario completo de sinónimos
+     * @param {Record<string, string[]>} dict
+     */
+    saveAll(dict) {
+      if (dict && typeof dict === 'object') {
+        this._saveAll(dict);
+      }
+    }
+
+    /**
      * Agrega un sinónimo a una palabra objetivo
      * @param {string} targetWord - Palabra de la lista del experimento
      * @param {string} synonym - Variante o sinónimo a asociar (ej: "zapatilla")
