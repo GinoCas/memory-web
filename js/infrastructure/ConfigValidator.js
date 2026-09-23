@@ -79,6 +79,7 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
       return Object.freeze({
         words: sanitizedWords,
         imagePath: config.imagePath.trim(),
+        recallImagePath: config.recallImagePath ? config.recallImagePath.trim() : "assets/image_without_words.png",
         googleSheetsWebAppUrl: config.googleSheetsWebAppUrl ? config.googleSheetsWebAppUrl.trim() : "",
         studyDurationSeconds: Math.floor(config.studyDurationSeconds),
         mathTaskDurationSeconds: Math.floor(config.mathTaskDurationSeconds),

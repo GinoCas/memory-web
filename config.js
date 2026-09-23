@@ -24,6 +24,9 @@ window.EXPERIMENT_CONFIG = {
   // Cuando tengas tu imagen, colócala en esta ruta o actualiza el nombre aquí.
   imagePath: "assets/image.png",
 
+  // Ruta de la imagen sin palabras que se muestra al Grupo Espacial durante la fase de recuerdo
+  recallImagePath: "assets/image_without_words.png",
+
   // URL del Web App de Google Apps Script para guardar datos en Google Sheets.
   // Déjalo vacío ("") si solo quieres guardar en el almacenamiento local del navegador.
   googleSheetsWebAppUrl: "https://script.google.com/macros/s/AKfycbx4TI0p5zXwwh_y2eCOIt768wpfAW5akdEDtKTmc5b8jTij9-JmOA1CeQpqsyx0krZ4/exec",

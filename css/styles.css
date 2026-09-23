@@ -667,6 +667,16 @@ main.app-container {
   font-size: 1.6rem;
 }
 
+.spatial-recall-cue {
+  max-width: 680px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.recall-spatial-viewport {
+  min-height: auto;
+  padding: 1rem;
+}
+
 .word-input-form {
   max-width: 550px;
   margin: 0 auto 1.5rem auto;

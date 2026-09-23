@@ -281,6 +281,26 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
       render({ rootElement, appState, events }) {
         const hasTimeLimit = appState.config.recallDurationSeconds > 0;
         const enteredWords = new Set();
+        const currentGroup = appState.currentSession ? appState.currentSession.group : Domain.GroupType.LIST;
+
+        // Estrategia de pista visual según grupo asignado (sin cadenas if-else)
+        const recallCueStrategyMap = {
+          [Domain.GroupType.SPATIAL]: () => `
+            <div class="spatial-recall-cue">
+              <div class="spatial-viewport recall-spatial-viewport">
+                <img
+                  id="recallSpatialImage"
+                  src="${appState.config.recallImagePath}"
+                  alt="Escenario visual sin palabras"
+                  class="spatial-image"
+                />
+              </div>
+            </div>
+          `,
+          [Domain.GroupType.LIST]: () => ''
+        };
+
+        const spatialCueHtml = (recallCueStrategyMap[currentGroup] || recallCueStrategyMap[Domain.GroupType.LIST])();
 
         rootElement.innerHTML = `
           <div class="screen-card recall-card">
@@ -302,6 +322,8 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
             ` : ''}
 
             <div class="recall-body">
+              ${spatialCueHtml}
+
               <form id="wordInputForm" class="word-input-form" autocomplete="off">
                 <div class="input-row">
                   <input 
