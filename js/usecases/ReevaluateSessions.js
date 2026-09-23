@@ -38,9 +38,10 @@ window.SpatialApp.UseCases = window.SpatialApp.UseCases || {};
       const synonymMap = this.synonymRepository.getMapping(targetWords);
 
       const updatedSessions = existingSessions.map(session => {
+        const tokenizedSubmitted = Domain.StringUtils.tokenizeWords(session.submittedWords);
         const evalResult = this.evaluateRecallUseCase.execute({
           targetWords: session.targetWords,
-          submittedWords: session.submittedWords,
+          submittedWords: tokenizedSubmitted,
           synonymMap
         });
 
@@ -49,7 +50,7 @@ window.SpatialApp.UseCases = window.SpatialApp.UseCases || {};
           participantName: session.participantName,
           group: session.group,
           targetWords: session.targetWords,
-          submittedWords: session.submittedWords,
+          submittedWords: tokenizedSubmitted,
           hits: evalResult.hits,
           misses: evalResult.misses,
           falseAlarms: evalResult.falseAlarms,

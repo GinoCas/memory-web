@@ -64,6 +64,7 @@ window.SpatialApp = window.SpatialApp || {};
       const refreshMap = {
         true: () => {
           this.useCases.reevaluateSessions.execute({ targetWords: this.config.words });
+          this._pushAdminChangesToCloud();
           this.render();
         },
         false: () => {}

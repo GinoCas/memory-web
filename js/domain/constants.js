@@ -73,6 +73,25 @@ window.SpatialApp.Domain = window.SpatialApp.Domain || {};
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^\w\s-]/g, '');
+    },
+
+    /**
+     * Divide cadenas o arreglos de palabras separadas por espacios, comas, puntos y coma,
+     * guiones o saltos de línea en palabras individuales limpias.
+     * Ej: "computadora bicicleta, pelota" -> ["computadora", "bicicleta", "pelota"]
+     * @param {string | string[]} input
+     * @returns {string[]}
+     */
+    tokenizeWords(input) {
+      const isArray = Array.isArray(input);
+      const rawList = isArray ? input : [String(input || '')];
+
+      const tokens = rawList
+        .flatMap(item => String(item || '').split(/[\s,;.\-\/|+]+/))
+        .map(w => w.trim().toLowerCase())
+        .filter(w => w.length > 0);
+
+      return [...new Set(tokens)];
     }
   });
 })(window.SpatialApp.Domain);

@@ -33,12 +33,8 @@ window.SpatialApp.UseCases = window.SpatialApp.UseCases || {};
         targetMap.set(normalize(word), word);
       });
 
-      // Deduplicar palabras enviadas por el usuario
-      const uniqueSubmitted = [...new Set(
-        submittedWords
-          .map(w => w.trim())
-          .filter(w => w.length > 0)
-      )];
+      // Tokenizar y deduplicar palabras enviadas (soporta palabras separadas por espacios o comas)
+      const uniqueSubmitted = Domain.StringUtils.tokenizeWords(submittedWords);
 
       const matchedNormalizedTargets = new Set();
       const hits = [];

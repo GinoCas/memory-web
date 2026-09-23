@@ -407,16 +407,17 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
 
         wordForm.addEventListener('submit', (e) => {
           e.preventDefault();
-          const rawWord = wordInput.value.trim();
+          const tokens = Domain.StringUtils.tokenizeWords(wordInput.value);
+          const newTokens = tokens.filter(w => !enteredWords.has(w));
 
           const submissionRules = [
             {
-              check: () => rawWord.length > 0,
-              message: 'Escribe una palabra antes de presionar Añadir.'
+              check: () => tokens.length > 0,
+              message: 'Escribe al menos una palabra antes de presionar Añadir.'
             },
             {
-              check: () => !enteredWords.has(rawWord.toLowerCase()),
-              message: `La palabra "${rawWord}" ya fue añadida.`
+              check: () => newTokens.length > 0,
+              message: `La(s) palabra(s) ya fueron añadidas.`
             }
           ];
 
@@ -427,9 +428,9 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
               showFeedback(failedRule.message, true);
             },
             false: () => {
-              enteredWords.add(rawWord.toLowerCase());
+              newTokens.forEach(w => enteredWords.add(w));
               wordInput.value = '';
-              showFeedback(`"${rawWord}" añadida`, false);
+              showFeedback(`Añadido: ${newTokens.join(', ')}`, false);
               updateWordsUI();
             }
           };
@@ -440,6 +441,11 @@ window.SpatialApp.Presentation = window.SpatialApp.Presentation || {};
 
         const finishRecall = () => {
           if (recallTimer) recallTimer.stop();
+
+          // Si el participante dejó palabras escritas en la caja sin presionar "Añadir", incorporarlas automáticamente
+          const pendingTokens = Domain.StringUtils.tokenizeWords(wordInput.value);
+          pendingTokens.forEach(w => enteredWords.add(w));
+
           const elapsed = recallTimer ? recallTimer.getElapsedSeconds() : 0;
           events.onRecallSubmitted({
             submittedWords: Array.from(enteredWords),

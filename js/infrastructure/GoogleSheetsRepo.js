@@ -131,14 +131,7 @@ window.SpatialApp.Infrastructure = window.SpatialApp.Infrastructure || {};
      */
     _mapRowToSession(row, defaultTargetWords) {
       try {
-        const parseList = (val) => {
-          const isArray = Array.isArray(val);
-          const listMap = {
-            true: () => val.map(w => String(w).trim()).filter(Boolean),
-            false: () => String(val || '').split(',').map(w => w.trim()).filter(Boolean)
-          };
-          return listMap[isArray]();
-        };
+        const parseList = (val) => Domain.StringUtils.tokenizeWords(val);
 
         const hits = parseList(row.hits);
         const misses = parseList(row.misses);
